@@ -1,0 +1,172 @@
+[
+  {
+    "title": "Laptop Acer Aspire",
+    "description": "Powerful laptop with Intel Core i7 processor and NVIDIA GeForce graphics.",
+    "price": 899.99,
+    "code": "ACER123",
+    "stock": 50,
+    "category": "Laptops",
+    "status": true,
+    "thumbnail": "/static/multimedia/laptop_acer.jpg"
+  },
+  {
+    "title": "Desktop PC HP Pavilion",
+    "description": "High-performance desktop PC for gaming and professional tasks.",
+    "price": 1299.99,
+    "code": "HP456",
+    "stock": 30,
+    "category": "Desktops",
+    "status": true,
+    "thumbnail": "/static/multimedia/desktop_hp.jpg"
+  },
+  {
+    "title": "Monitor Dell UltraSharp",
+    "description": "Crystal-clear 4K resolution monitor with ultra-thin bezels.",
+    "price": 499.99,
+    "code": "DELL789",
+    "stock": 20,
+    "category": "Monitors",
+    "status": true,
+    "thumbnail": "/static/multimedia/monitor_dell.jpg"
+  },
+  {
+    "title": "Logitech Wireless Keyboard and Mouse Combo",
+    "description": "Ergonomic keyboard and mouse combo for comfortable typing and navigation.",
+    "price": 59.99,
+    "code": "LOGI101",
+    "stock": 100,
+    "category": "Accessories",
+    "status": true,
+    "thumbnail": "/static/multimedia/keyboard_mouse_combo.jpg"
+  },
+  {
+    "title": "Seagate 2TB External Hard Drive",
+    "description": "High-capacity external hard drive for data backup and storage.",
+    "price": 79.99,
+    "code": "SEA256",
+    "stock": 25,
+    "category": "Storage",
+    "status": true,
+    "thumbnail": "/static/multimedia/hard_drive_seagate.jpg"
+  },
+  {
+    "title": "AMD Ryzen 7 Processor",
+    "description": "Eight-core processor with high clock speeds for smooth multitasking.",
+    "price": 349.99,
+    "code": "AMD888",
+    "stock": 15,
+    "category": "Components",
+    "status": true,
+    "thumbnail": "/static/multimedia/amd_ryzen_processor.jpg"
+  },
+  {
+    "title": "Corsair 16GB DDR4 RAM",
+    "description": "Fast and reliable memory module for improved system performance.",
+    "price": 89.99,
+    "code": "CORSAIR777",
+    "stock": 40,
+    "category": "Components",
+    "status": true,
+    "thumbnail": "/static/multimedia/corsair_ram.jpg"
+  },
+  {
+    "title": "Samsung 500GB SSD",
+    "description": "Solid State Drive for faster boot times and application loading.",
+    "price": 119.99,
+    "code": "SAMSUNG555",
+    "stock": 35,
+    "category": "Storage",
+    "status": true,
+    "thumbnail": "/static/multimedia/samsung_ssd.jpg"
+  },
+  {
+    "title": "ASUS ROG Gaming Mouse",
+    "description": "High-precision gaming mouse with customizable RGB lighting.",
+    "price": 69.99,
+    "code": "ASUS123",
+    "stock": 50,
+    "category": "Gaming Accessories",
+    "status": true,
+    "thumbnail": "/static/multimedia/gaming_mouse_asus.jpg"
+  },
+  {
+    "title": "HP LaserJet Pro Printer",
+    "description": "Fast and reliable monochrome laser printer for home and office use.",
+    "price": 179.99,
+    "code": "HP789",
+    "stock": 10,
+    "category": "Printers",
+    "status": true,
+    "thumbnail": "/static/multimedia/printer_hp.jpg"
+  },
+  {
+    "title": "LG 27-Inch UltraGear Gaming Monitor",
+    "description": "QHD gaming monitor with high refresh rate for smooth gameplay.",
+    "price": 399.99,
+    "code": "LG555",
+    "stock": 15,
+    "category": "Monitors",
+    "status": true,
+    "thumbnail": "/static/multimedia/monitor_lg.jpg"
+  },
+  {
+    "title": "Microsoft Surface Pro 7",
+    "description": "Versatile 2-in-1 laptop with touch screen and detachable keyboard.",
+    "price": 899.99,
+    "code": "MSFT456",
+    "stock": 20,
+    "category": "Laptops",
+    "status": true,
+    "thumbnail": "/static/multimedia/laptop_microsoft.jpg"
+  },
+  {
+    "title": "Razer BlackWidow Elite Mechanical Gaming Keyboard",
+    "description": "Mechanical gaming keyboard with customizable RGB lighting and programmable keys.",
+    "price": 149.99,
+    "code": "RAZER101",
+    "stock": 30,
+    "category": "Gaming Accessories",
+    "status": true,
+    "thumbnail": "/static/multimedia/gaming_keyboard_razer.jpg"
+  },
+  {
+    "title": "Canon EOS Rebel T7 DSLR Camera",
+    "description": "Entry-level DSLR camera with 24.1 megapixels and Full HD video recording.",
+    "price": 549.99,
+    "code": "CANON789",
+    "stock": 8,
+    "category": "Cameras",
+    "status": true,
+    "thumbnail": "/static/multimedia/camera_canon.jpg"
+  },
+  {
+    "title": "TP-Link Archer C4000 Tri-Band Wi-Fi Router",
+    "description": "High-performance tri-band router for fast and reliable internet connectivity.",
+    "price": 249.99,
+    "code": "TPLINK555",
+    "stock": 12,
+    "category": "Networking",
+    "status": true,
+    "thumbnail": "/static/multimedia/router_tplink.jpg"
+  },
+  {
+    "title": "Western Digital 4TB Internal Hard Drive",
+    "description": "Large-capacity internal hard drive for desktop computers.",
+    "price": 129.99,
+    "code": "WD456",
+    "stock": 18,
+    "category": "Storage",
+    "status": true,
+    "thumbnail": "/static/multimedia/hard_drive_wd.jpg"
+  },
+  {
+    "title": "Acer Predator Helios 300 Gaming Laptop",
+    "description": "Gaming laptop with NVIDIA GeForce GTX 1660 Ti graphics and 144Hz refresh rate.",
+    "price": 1299.99,
+    "code": "ACERPRED789",
+    "stock": 10,
+    "category": "Gaming Laptops",
+    "status": true,
+    "thumbnail": "/static/multimedia/laptop"
+  }
+]

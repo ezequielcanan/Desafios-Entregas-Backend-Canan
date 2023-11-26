@@ -1,0 +1,23 @@
+<main>
+  <h1>Cart's Products</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Price by unit</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+        <tr class="product">
+          <td>{{this.product.title}}</td>
+          <td>{{this.product.category}}</td>
+          <td>{{this.quantity}}</td>
+          <td>{{this.product.price}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</main>

@@ -1,0 +1,54 @@
+<main>
+  <h1>Products</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Stock</th>
+        <th>Price</th>
+        <th>More</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each docs}}
+        <tr class="product">
+          <td>{{this.title}}</td>
+          <td>{{this.category}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.price}}</td>
+          <td>
+            <button class="view-more-button" id="{{this._id}}">View More</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <div>
+    {{#if hasPrevPage}}
+      <button class="link-pages">{{prevPage}}</button>
+    {{/if}}
+    <button class="actual-page">{{page}}</button>
+    {{#if hasNextPage}}
+      <button class="link-pages">{{nextPage}}</button>
+    {{/if}}
+  </div>
+</main>
+
+<script>
+  const pagesButtons = document.querySelectorAll(".link-pages")
+  const viewMoreButtons = document.querySelectorAll(".view-more-button")
+  for (let button of pagesButtons) {
+    button.onclick = (e) => {
+      const queryParams = new URLSearchParams(window.location.search)
+      queryParams.set("page", button.innerText)
+      window.location.replace("/products?"+queryParams)
+    }
+  }
+
+  for (let button of viewMoreButtons) {
+    button.onclick = (e) => {
+      window.location.replace("/products/"+e.target.id)
+    }
+  }
+</script>
