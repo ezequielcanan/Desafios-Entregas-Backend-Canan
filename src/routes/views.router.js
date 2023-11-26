@@ -21,8 +21,7 @@ router.get("/products", async (req, res) => {
     title && (queryFindParameters.title = title, optionsPaginate.page = 1)
 
     const result = await productModel.paginate(queryFindParameters, optionsPaginate)
-    console.log(page, result.totalPages)
-    if (result.page > result.totalPages || result.page < 1) return res.status(400).send("Incorrect Page")
+    if (result.page > result.totalPages || result.page < 1 || isNaN(page)) return res.status(400).send("Incorrect Page")
     res.render("products", result)
   }
   catch (e) {
