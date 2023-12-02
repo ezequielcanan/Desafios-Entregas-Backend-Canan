@@ -4,7 +4,23 @@ import cartModel from "../dao/models/carts.model.js"
 
 const router = Router()
 
-router.get("/products", async (req, res) => {
+// MIDDLEWARES
+
+const justPublicWitoutSession = (req,res,next) => {
+  if (req.session?.user) return res.redirect("/products")
+  
+  return next()
+}
+
+const auth = (req,res,next) => {
+  if (req.session?.user) return next()
+
+  return res.redirect("/login")
+}
+
+//******/
+
+router.get("/products", auth, async (req, res) => {
   try {
     const queryFindParameters = {}
     const limit = parseInt(req.query?.limit ?? 10)
@@ -21,6 +37,7 @@ router.get("/products", async (req, res) => {
     title && (queryFindParameters.title = title, optionsPaginate.page = 1)
 
     const result = await productModel.paginate(queryFindParameters, optionsPaginate)
+    result.user = req.session?.user
     if (result.page > result.totalPages || result.page < 1 || isNaN(page)) return res.status(400).send("Incorrect Page")
     res.render("products", result)
   }
@@ -53,6 +70,14 @@ router.get("/carts/:cid", async (req,res) => {
     console.error("Error:",e)
     res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
   }
+})
+
+router.get("/login", justPublicWitoutSession, (req,res) => {
+  return res.render("login",{})
+})
+
+router.get("/register", justPublicWitoutSession, (req,res) => {
+  return res.render("register", {})
 })
 
 router.get("/chat", (req, res) => {
