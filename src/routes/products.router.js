@@ -1,71 +1,62 @@
-import {Router} from "express"
-import productModel from "../dao/models/products.model.js"
+import { Router } from "express";
+import ProductManager from "../dao/managers/ProductManager.js";
+import productModel from "../dao/models/products.model.js";
 
-const router = Router()
+const router = Router();
+const productManager = new ProductManager();
 
-router.get("/", async (req,res) => {
+router.get("/", async (req, res) => {
   try {
-    const products = await productModel.find().lean().exec()
-    res.send(products)
+    const result = productManager.getProducts(req);
+    if (result.status == 400 || result.status == 500)
+      return res.status(result.status).send(result.message);
+    return res.send(result)
+  } catch (e) {
+    res.status(500).send("Server error")
   }
-  catch(e) {
-    res.status(500).send("Error en el servidor")
-  }
-})
+});
 
-router.get("/:pid", async (req,res) => {
-  try {   
-    const {pid} = req.params
-    const product = await productModel.findById(pid).lean().exec()
-    res.status(!product ? 404 : 200).send(product)
-  }
-  catch(e) {
-    console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
-  }
-})
-
-router.post("/", async (req,res) => {
+router.get("/:pid", async (req, res) => {
   try {
-    const products = await productModel.find().lean().exec()
-    if (!products.some(p => p.code === req.body.code)) {
-      if (!req.body.title || !req.body.description || !req.body.price || !req.body.code || !req.body.stock || !req.body.category) return res.status(400).json({message: "Missed properties"})
-      const newProduct = await productModel.create(req.body)
-      res.status(!newProduct ? 500 : 200).send(newProduct)
-    } else {
-      res.status(400).json({message: "Invalid code"})
-    }
+    const { pid } = req.params;
+    const product = await productManager.getProductById(pid)
+    res.status(!product ? 404 : 200).send(product);
+  } catch (e) {
+    console.error("Error:", e);
+    res.status(500).send("Server error")
   }
-  catch(e) {
-    console.error("Error:",e)
-    res.status(500).send("Error en el servidor")
-  }
-})
+});
 
-router.put("/:pid", async (req,res) => {
+router.post("/", async (req, res) => {
   try {
-    const {pid} = req.params
-    let product = await productModel.findById(pid).lean().exec()
-    if (req.body._id || req.body.code) return res.status(400).json({message: "Invalid property"})
-    const updatedProduct = await productModel.updateOne({_id: pid}, {...product, ...req.body})
-    res.status(!updatedProduct ? 500 : 200).send(updatedProduct)
+    const result = await productManager.addProduct(req.body, req.body)
+    res.status(result.status).send(result.payload)
+  } catch (e) {
+    console.error("Error:", e);
+    res.status(500).send("Server error")
   }
-  catch(e) {
-    console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
-  }
-})
+});
 
-router.delete("/:pid", async (req,res) => {
+router.put("/:pid", async (req, res) => {
   try {
-    const {pid} = req.params
-    const deletedProduct = await productModel.deleteOne({_id: pid})
-    res.status(!deletedProduct ? 404 : 200).send(deletedProduct)
+    const { pid } = req.params;
+    const result = await productManager.updateProduct(pid, req.body)
+    res.status(result.status).send(result.payload);
+  } catch (e) {
+    console.error("Error:", e);
+    res.status(500).send("Server error")
   }
-  catch(e) {
-    console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
-  }
-})
+});
 
-export default router
+router.delete("/:pid", async (req, res) => {
+  try {
+    const { pid } = req.params;
+    const result = await productManager.deleteProduct(pid)
+    res.status(result.status).send(result.payload);
+  } catch (e) {
+    console.error("Error:", e);
+    res.status(500).send("Server error")
+  }
+});
+
+export default router;

@@ -1,95 +1,40 @@
-import fs from "fs"
+import cartModel from "../models/carts.model.js";
 
 class CartManager {
-  constructor(filename) {
-    this.path = filename
-    this.readFormat = "utf-8"
-  }
+  constructor() {}
 
-  writeFile = async (array) => {
+  getCartById = async (cid) => {
     try {
-      await fs.promises.writeFile(this.path, JSON.stringify(array))
+      const cart = await cartModel.findOne({_id: cid}).lean().exec()
+      if (!cart) return {status: 404, payload: "Not found"}
+      return {status: 200, payload: cart.products}
+    } catch (e) {
+      console.error("Error:", e);
+      if (e.name == "CastError") {
+        return { status: 404, payload: "Not found" };
+      } else return { status: 500, payload: "Server Error" };
     }
-    catch (e) {
-      console.error("Error: ",e)
-      return e
-    }
-  }
+  };
 
   addCart = async (products) => {
     try {
-      const carts = await this.getCarts()
-      if (!products) return "Missed properties"
-      
-      const id = (carts.length && carts[carts.length - 1].id + 1) || 1
-      const newCart = {
-        id,
-        products
-      }
-  
-      carts.push(newCart)
-      await this.writeFile(carts)
-      return newCart
-    }
-    catch(e) {
-      console.error("Error: ",e)
-      return []
-    }
-  }
-
-  addProductsInCart = async (cid,pid,quantity) => {
-    try {
-      const carts = await this.getCarts()
-      const indexOfCart = await this.getIndexOfCart(cid)
-      const products = await this.getProductsOfCart(cid)
-
-      const indexProduct = products.findIndex(p => p.product === pid)
-      indexProduct != -1 ? products[indexProduct].quantity+=quantity : products.push({product: pid, quantity: quantity})
-      carts[indexOfCart].products = products
-  
-      await this.writeFile(carts)
-      return products
-    }
-    catch(e) {
-      console.error("Error: ",e)
-      return []
-    }
-  }
-
-  getIndexOfCart = async (cid) => {
-    try {
-      const carts = await this.getCarts()
-      const cart = carts.findIndex(c => c.id === cid)
-      return cart
-    } 
-    catch (e) {
-      console.error("Error: ",e)
-      return []
-    }
-  }
-
-  getCarts = async () => {
-    try {
-      if (!fs.existsSync(this.path)) return []
-      const carts = await fs.promises.readFile(this.path)
-      const cartsObjects = carts ? JSON.parse(carts) : []
-      return cartsObjects
+      const cart = await cartModel.create({products})
+      return {status: !cart ? 500 : 200, payload: cart}
     }
     catch (e) {
-      console.error("Error: ",e)
-      return []
+      console.error("Error:", e);
+      return {status: 500, payload: e}
     }
   }
 
-  getProductsOfCart = async (cid) => {
+  updateCartProducts = async (cid, products) => {
     try {
-      const carts = await this.getCarts()
-      const cart = carts.find(cart => cart.id === cid)
-      return cart?.products || "No existe"
+      const result = await cartModel.updateOne({_id: cid}, {$set: {products}})
+      return {status: result.modifiedCount ? 200 : 404, payload: result}
     }
-    catch(e) {
-      console.error(e)
-      return []
+    catch (e) {
+      console.error("Error:", e);
+      return {status: 500, payload: e}
     }
   }
 }

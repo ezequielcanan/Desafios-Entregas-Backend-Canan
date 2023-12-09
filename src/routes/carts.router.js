@@ -1,28 +1,29 @@
 import {Router} from "express"
+import CartManager from "../dao/managers/CartManager.js"
 import cartModel from "../dao/models/carts.model.js"
 
 const router = Router()
+const cartManager = new CartManager()
 
 router.get("/:cid", async (req,res) => {
   try {
     const {cid} = req.params
-    const products = await cartModel.findOne({_id: cid}).lean().exec()
-    if (!products) return res.status(404).json({message: "Not found"})
-    res.status(!products ? 404 : 200).send(products.products)
+    const result = await cartManager.getCartById(cid)
+    res.status(result.status).send(result.payload)
   }
   catch(e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 
 router.post("/", async (req,res) => {
   try {
-    const cart = await cartModel.create({products: req.body.products || [], })
-    res.status(!cart ? 500 : 200).send(cart)
+    const result = await cartManager.addCart(req.body?.products || [])
+    res.status(result.status).send(result.payload)
   }
   catch(e) {
-    res.status(500).send("Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 
@@ -30,11 +31,11 @@ router.put("/:cid", async (req,res) => {
   try {
     const {body: {products}, params: {cid}} = req
     if (!products) return res.status(400).json({status: "error", payload: "There aren't products specified"})
-    const result = await cartModel.updateOne({_id: cid}, {$set: {products}})
-    res.status(result.modifiedCount ? 200 : 404).json({status: "success", payload: result})
+    const result = await cartManager.updateCartProducts(cid, products)
+    res.status(result.status).json({status: result.status, payload: result.payload})
   }
   catch(e) {
-    res.status(500).send("Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 

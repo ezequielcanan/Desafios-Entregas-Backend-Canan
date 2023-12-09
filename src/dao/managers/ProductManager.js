@@ -1,104 +1,102 @@
-import fs from "fs"
+import productModel from "../models/products.model.js";
 
 class ProductManager {
-  constructor(filename) {
-    this.readFormat = "utf-8";
-    this.path = filename;
-  }
+  constructor() {}
 
-  async addProduct({title, description, price, code, stock, category, thumbnail=undefined, status=true}) {
+  getProducts = async (req) => {
     try {
-      const products = await this.getProducts();
-      if (products.some((product) => product.code === code))
-        return "Invalid code";
-      if (!title || !description || !price || !code || !stock || !category) return "Missed properties"
+      const queryFindParameters = {};
+      const limit = parseInt(req.query?.limit ?? 10);
+      const page = parseInt(req.query?.page ?? 1);
+      const title = req.query?.query || null;
+      const optionsPaginate = { limit, page, lean: true };
+      const sortOrder = req.query?.sort?.toLowerCase();
+      const categoryFilter = req.query?.category;
+      const stockFilter = parseInt(req.query?.stock);
   
-      const id = (products.length && products[products.length - 1].id + 1) || 1;
-      const newProduct = {
-        id,
-        title,
-        description,
-        price,
-        thumbnail,
-        code,
-        stock,
-        category,
-        status
-      };
+      (sortOrder === "asc" && (optionsPaginate.sort = { price: 1 })) ||
+        (sortOrder === "desc" && (optionsPaginate.sort = { price: -1 }));
+      stockFilter && (queryFindParameters.stock = { $gte: stockFilter });
+      categoryFilter && !title && (queryFindParameters.category = categoryFilter);
+      title && ((queryFindParameters.title = title), (optionsPaginate.page = 1));
   
-      products.push(newProduct);
-  
-      await fs.promises.writeFile(this.path, JSON.stringify(products));
-      return newProduct;
-    }
-    catch(e) {
-      console.error("Error: ", e)
-      return []
-    }
-  }
-
-  getProducts = async (limit=0) => {
-    try {
-      if (!fs.existsSync(this.path)) return [];
-      const products = await fs.promises.readFile(this.path, this.readFormat);
-      const productsObject = products ? JSON.parse(products) : [];
-      return productsObject.slice(0,(limit ? limit : undefined)) ;
-    } catch (e) {
-      console.error("Error: ", e);
-      return []
-    }
-  };
-
-  getProductById = async (id) => {
-    try {
-      const products = await this.getProducts();
-      const product = products.find((p) => p.id === id);
-      return product || "No existe";
-    } 
-    catch(e) {
-      console.error("Error: ",e)
-      return []
-    }
-  };
-
-  updateProduct = async (id, properties) => {
-    try {
-      if (properties["id"]) delete properties["id"]
-      const products = await this.getProducts();
-      const updatedProducts = products.map((p) =>
-        p.id === id ? { ...p, ...properties} : p
+      const result = await productModel.paginate(
+        queryFindParameters,
+        optionsPaginate
       );
-      await fs.promises.writeFile(this.path, JSON.stringify(updatedProducts));
-  
-      return updatedProducts;
+      result.user = req.session?.user;
+      if (result.page > result.totalPages || result.page < 1 || isNaN(page))
+        return { status: 400, message: "Incorrect Page" };
+      return result;
     }
-    catch(e) {
-      console.error("Error: ",e)
-      return []
+    catch (e) {
+      console.error("Error:", e);
+      return {status: 500, message: e}
     }
   };
 
-  deleteProduct = async (id) => {
+  getProductById = async (pid) => {
     try {
-      const product = await this.getProductById(id)
-      if (product != "No existe") {
-        const products = await this.getProducts();
-        const deletedProduct = products.splice(
-          products.findIndex((p) => p.id === id),
-          1
-        );
-        await fs.promises.writeFile(this.path, JSON.stringify(products));
-        return (deletedProduct.length && deletedProduct) || "No existe";
-      }
-      else {
-        return "No existe"
+      const product = await productModel.findById(pid).lean().exec();
+      return product;
+    } catch (e) {
+      console.error("Error:", e);
+      if (e.name == "CastError") {
+        return { status: 404, payload: "Not found" };
+      } else return { status: 500, payload: "Server Error" };
+    }
+  };
+
+  addProduct = async (
+    body,
+    { title, description, price, stock, code, category }
+  ) => {
+    try {
+      const product = await productModel.findOne({ code }).lean().exec();
+      if (!product) {
+        if (!title || !description || !price || !stock || !code || !category)
+          return { status: 400, payload: "Missed Properties" };
+        const newProduct = await productModel.create(body);
+        return { status: !newProduct ? 500 : 200, payload: newProduct };
+      } else {
+        return { status: 400, payload: "Invalid Code" };
       }
     }
     catch(e) {
-      console.error("Error: ",e)
-      return []
+      console.error("Error:", e);
+      return {status: 500, payload: e}
+    }
+  };
+
+  updateProduct = async (pid, body) => {
+    try {
+      const product = await productModel.findById(pid).lean().exec();
+      if ((body._id, body.code))
+        return { status: 400, payload: "Invalid property" };
+      const updatedProduct = await productModel.updateOne(
+        { _id: pid },
+        { ...product, ...body }
+      );
+      return { status: !updatedProduct ? 500 : 200, payload: updatedProduct };
+    } catch (e) {
+      console.error("Error:", e);
+      if (e.name == "CastError") {
+        return { status: 404, payload: "Not found" };
+      } else return { status: 500, payload: "Server Error" };
+    }
+  };
+
+  deleteProduct = async (pid) => {
+    try {
+      const deletedProduct = await productModel.deleteOne({ _id: pid });
+      return { status: !deletedProduct ? 404 : 200, payload: deletedProduct };
+    } catch (e) {
+      console.error("Error:", e);
+      if (e.name == "CastError") {
+        return { status: 404, payload: "Not found" };
+      } else return { status: 500, payload: "Server Error" };
     }
   };
 }
 
-export default ProductManager
+export default ProductManager;

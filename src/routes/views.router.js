@@ -1,9 +1,10 @@
 import { Router } from "express"
+import ProductManager from "../dao/managers/ProductManager.js"
 import productModel from "../dao/models/products.model.js"
 import cartModel from "../dao/models/carts.model.js"
 
 const router = Router()
-
+const productManager = new ProductManager()
 // MIDDLEWARES
 
 const justPublicWitoutSession = (req,res,next) => {
@@ -22,24 +23,9 @@ const auth = (req,res,next) => {
 
 router.get("/products", auth, async (req, res) => {
   try {
-    const queryFindParameters = {}
-    const limit = parseInt(req.query?.limit ?? 10)
-    const page = parseInt(req.query?.page ?? 1)
-    const title = req.query?.query || null
-    const optionsPaginate = { limit, page, lean: true }
-    const sortOrder = req.query?.sort?.toLowerCase()
-    const categoryFilter = req.query?.category
-    const stockFilter = parseInt(req.query?.stock)
-  
-    sortOrder === "asc" && (optionsPaginate.sort = { price: 1 }) || sortOrder === "desc" && (optionsPaginate.sort = { price: -1 })
-    stockFilter && (queryFindParameters.stock = {$gte: stockFilter})  
-    categoryFilter && !title && (queryFindParameters.category = categoryFilter)
-    title && (queryFindParameters.title = title, optionsPaginate.page = 1)
-
-    const result = await productModel.paginate(queryFindParameters, optionsPaginate)
-    result.user = req.session?.user
-    if (result.page > result.totalPages || result.page < 1 || isNaN(page)) return res.status(400).send("Incorrect Page")
-    res.render("products", result)
+    const result = await productManager.getProducts(req)
+    if (result.status == 400) return res.status(result.status).send(result.message)
+    return res.render("products", result)
   }
   catch (e) {
     console.error(e)
@@ -48,8 +34,9 @@ router.get("/products", auth, async (req, res) => {
 
 router.get("/products/:pid", async (req,res) => {
   try {
-    const {pid} = req.params
-    const product = await productModel.findById(pid)
+    const { pid } = req.params;
+    const product = await productManager.getProductById(pid)
+    if (!product) return res.status(400).send(product)
     res.render("product", product)
   }
   catch (e) {
