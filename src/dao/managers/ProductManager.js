@@ -71,7 +71,7 @@ class ProductManager {
   updateProduct = async (pid, body) => {
     try {
       const product = await productModel.findById(pid).lean().exec();
-      if ((body._id, body.code))
+      if (body._id || body.code)
         return { status: 400, payload: "Invalid property" };
       const updatedProduct = await productModel.updateOne(
         { _id: pid },

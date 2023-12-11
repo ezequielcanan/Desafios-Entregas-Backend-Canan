@@ -1,6 +1,5 @@
 import {Router} from "express"
 import CartManager from "../dao/managers/CartManager.js"
-import cartModel from "../dao/models/carts.model.js"
 
 const router = Router()
 const cartManager = new CartManager()
@@ -42,44 +41,36 @@ router.put("/:cid", async (req,res) => {
 router.put("/:cid/product/:pid", async (req,res) => {
   try {
     const {params: {cid,pid}, body: {quantity}} = req
-    const cart = await cartModel.findById(cid).lean().exec()
-    if (!cart) return res.status(404).json({message: "Not found"})
-    const existsProduct = cart.products.findIndex((p) => p.product._id == pid)
-    if (existsProduct == -1) {
-      cart.products.push({product: pid, quantity})
-    } else {
-      cart.products[existsProduct].quantity = quantity
-    }
-    const newProducts = await cartModel.updateOne({_id: cid}, cart)
-    res.status(!newProducts ? 500 : 200).send(newProducts)
+    const result = await cartManager.updateProductFromCart(pid, cid, quantity)
+    res.status(result.status).send(result.payload)
   }
   catch(e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 
 router.delete("/:cid", async (req,res) => {
   try {
     const {params: {cid}} = req
-    const result = await cartModel.updateOne({_id: cid}, {$set: {products: []}})
-    res.status(result.modifiedCount ? 200 : 400).json({status: "success", payload: result})
+    const result = await cartManager.deleteProducts(cid)
+    res.status(result.status).json(result.payload)
   }
   catch(e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 
 router.delete("/:cid/products/:pid", async (req,res) => {
   try {
     const {params: {cid,pid}} = req
-    const result = await cartModel.updateOne({_id: cid}, {$pull: {"products": {product: pid}}})
-    res.status(result.modifiedCount ? 200 : 404).json({status: "success", payload: result})
+    const result = await cartManager.deleteProductFromCart(cid, pid)
+    res.status(result.status).json(result.payload)
   }
   catch(e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
 

@@ -1,16 +1,15 @@
-import { Router } from "express";
-import ProductManager from "../dao/managers/ProductManager.js";
-import productModel from "../dao/models/products.model.js";
+import { Router } from "express"
+import ProductManager from "../dao/managers/ProductManager.js"
 
 const router = Router();
 const productManager = new ProductManager();
 
 router.get("/", async (req, res) => {
   try {
-    const result = productManager.getProducts(req);
+    const result = await productManager.getProducts(req);
     if (result.status == 400 || result.status == 500)
       return res.status(result.status).send(result.message);
-    return res.send(result)
+    return res.send(result.docs)
   } catch (e) {
     res.status(500).send("Server error")
   }

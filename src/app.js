@@ -10,6 +10,8 @@ import __dirname from "./utils.js"
 import { Server } from "socket.io"
 import session from "express-session"
 import MongoStore from "connect-mongo"
+import initializePassport from "./config/passport.config.js"
+import passport from "passport"
 
 const PORT = 8080
 const mongoUrl = "mongodb+srv://admin:1234@ecommerce.yr9omem.mongodb.net/"
@@ -34,6 +36,10 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use("/api/session", routerSession)
 app.use("/api/products", routerProducts)

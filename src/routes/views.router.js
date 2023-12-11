@@ -1,10 +1,11 @@
 import { Router } from "express"
 import ProductManager from "../dao/managers/ProductManager.js"
-import productModel from "../dao/models/products.model.js"
-import cartModel from "../dao/models/carts.model.js"
+import CartManager from "../dao/managers/CartManager.js"
 
 const router = Router()
+
 const productManager = new ProductManager()
+const cartManager = new CartManager()
 // MIDDLEWARES
 
 const justPublicWitoutSession = (req,res,next) => {
@@ -29,6 +30,7 @@ router.get("/products", auth, async (req, res) => {
   }
   catch (e) {
     console.error(e)
+    return res.status(500).send("Server error")
   }
 })
 
@@ -41,23 +43,24 @@ router.get("/products/:pid", async (req,res) => {
   }
   catch (e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    return res.status(500).send("Server error")
   }
 })
 
 router.get("/carts/:cid", async (req,res) => {
   try {
     const {cid} = req.params
-    const cart = await cartModel.findOne({_id: cid}).lean().exec()
-    console.log(cart)
-    res.render("cart", cart)
+    const products = await cartManager.getCartById(cid)
+    res.render("cart", {products})
 
   }
   catch (e) {
     console.error("Error:",e)
-    res.status(e.name == "CastError" ? 400 : 500).send(e.name == "CastError" ? "Not found" : "Error en el servidor")
+    res.status(500).send("Server error")
   }
 })
+
+router.get("/", (req,res) => res.redirect("/login"))
 
 router.get("/login", justPublicWitoutSession, (req,res) => {
   return res.render("login",{})
@@ -68,7 +71,7 @@ router.get("/register", justPublicWitoutSession, (req,res) => {
 })
 
 router.get("/chat", (req, res) => {
-  res.render("chat", {})
+  return res.render("chat", {})
 })
 
 export default router
