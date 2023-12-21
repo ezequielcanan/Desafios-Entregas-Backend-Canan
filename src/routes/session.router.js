@@ -1,18 +1,13 @@
 import { Router } from "express"
 import passport from "passport"
-import UserModel from "../dao/models/users.model.js"
-import { generateToken, isValidPassword } from "../utils.js"
 
 const router = Router()
 
-router.post("/login", async (req, res) => {
+router.post("/login", passport.authenticate("login", {session: false, failureRedirect: "/"}), async (req, res) => {
   try {
-    const { email, password } = req.body
-    const user = await UserModel.findOne({email})
+    if (!req.user) return res.status(400).send("Invalid credentials")
 
-    if (!isValidPassword(user, password)) return res.status(401).redirect("/login")
-
-    const token = generateToken(user)
+    const {token} = req.user
 
     res.cookie("jwtCookie", token).redirect("/products")
   } catch (e) {
@@ -21,7 +16,7 @@ router.post("/login", async (req, res) => {
   }
 })
 
-router.post("/register", passport.authenticate("register", {failureRedirect: "/"}), async (req, res) => {
+router.post("/register", passport.authenticate("register", {failureRedirect: "/", session: false}), async (req, res) => {
   try {
     res.send({ url: "login" })
   }
@@ -31,9 +26,9 @@ router.post("/register", passport.authenticate("register", {failureRedirect: "/"
   }
 })
 
-router.get("/github", passport.authenticate("github", {scope: ['user:email']}), async (req,res) => {})
+router.get("/github", passport.authenticate("github", {scope: ['user:email'], session: false}), async (req,res) => {})
 
-router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/"}), async (req,res) => {
+router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/", session: false}), async (req,res) => {
   try {
     if (!req.user) return res.status(400).json({status: "error", payload: "Invalid github"})
     return res.cookie("jwtCookie", req?.user?.token).redirect("/products")

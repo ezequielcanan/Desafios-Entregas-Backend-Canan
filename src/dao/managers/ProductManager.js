@@ -24,7 +24,7 @@ class ProductManager {
         queryFindParameters,
         optionsPaginate
       );
-      result.user = req.user
+      result.user = req.user?.user
       if (result.page > result.totalPages || result.page < 1 || isNaN(page))
         return { status: 400, message: "Incorrect Page" };
       return result;

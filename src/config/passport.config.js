@@ -38,7 +38,33 @@ const initializePassport = () => {
       return done(null, result)
     }
     catch (e) {
-      return done("Error: " + e)
+      return done("Errorr: " + e)
+    }
+  }))
+
+  passport.use("login", new LocalStrategy({
+    usernameField: "email"
+  }, async (username, password, done) => {
+    try {
+      const user = await UserModel.findOne({email: username}).lean().exec()
+
+      if (!user) {
+        console.log("User doesn't exists")
+        return done(null, false)
+      }
+
+      if (!isValidPassword(user, password)) {
+        console.log("Incorrect password")
+        return done(null, false)
+      }
+
+      const token = generateToken(user)
+      user.token = token
+
+      return done(null, user)
+    }
+    catch(e) {
+      return done("Error: "+e)
     }
   }))
 

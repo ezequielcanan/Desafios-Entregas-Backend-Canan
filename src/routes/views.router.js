@@ -1,7 +1,6 @@
 import { Router } from "express"
 import ProductManager from "../dao/managers/ProductManager.js"
 import CartManager from "../dao/managers/CartManager.js"
-import { authorization } from "../utils.js"
 import passport from "passport"
 
 const router = Router()
@@ -9,7 +8,19 @@ const router = Router()
 const productManager = new ProductManager()
 const cartManager = new CartManager()
 
-router.get("/products", passport.authenticate("jwt", {session: false}), async (req, res) => {
+const isLoggedIn = (req,res,next) => {
+  if (req.cookies.jwtCookie) return res.redirect("/products")
+
+ return next()
+}
+
+const auth = (req,res,next) => {
+  if (req.cookies.jwtCookie) return next()
+
+  return res.redirect("/login")
+}
+
+router.get("/products", auth, passport.authenticate("jwt", {session: false}), async (req, res) => {
   try {
     const result = await productManager.getProducts(req)
     if (result.status == 400) return res.status(result.status).send(result.message)
@@ -49,11 +60,11 @@ router.get("/carts/:cid", async (req,res) => {
 
 router.get("/", (req,res) => res.redirect("/login"))
 
-router.get("/login", (req,res) => {
+router.get("/login", isLoggedIn, (req,res) => {
   return res.render("login",{})
 })
 
-router.get("/register", (req,res) => {
+router.get("/register", isLoggedIn, (req,res) => {
   return res.render("register", {})
 })
 
