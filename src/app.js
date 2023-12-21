@@ -8,8 +8,6 @@ import handlebars from "express-handlebars"
 import messageModel from "./dao/models/messages.model.js"
 import __dirname from "./utils.js"
 import { Server } from "socket.io"
-import session from "express-session"
-import MongoStore from "connect-mongo"
 import initializePassport from "./config/passport.config.js"
 import passport from "passport"
 
@@ -27,19 +25,8 @@ app.engine("handlebars", handlebars.engine())
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl,
-    dbName
-  }),
-  secret: "secret",
-  resave: true,
-  saveUninitialized: true
-}))
-
 initializePassport()
 app.use(passport.initialize())
-app.use(passport.session())
 
 app.use("/api/session", routerSession)
 app.use("/api/products", routerProducts)
