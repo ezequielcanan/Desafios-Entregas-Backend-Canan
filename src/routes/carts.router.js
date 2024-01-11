@@ -1,25 +1,22 @@
 import {Router} from "express"
-import CartManager from "../dao/managers/CartManager.js"
+import { cartsService } from "../services/index.js"
 
 const router = Router()
-const cartManager = new CartManager()
 
 router.get("/:cid", async (req,res) => {
   try {
-    const {cid} = req.params
-    const result = await cartManager.getCartById(cid)
-    res.status(result.status).send(result.payload)
+    const result = await cartsService.getCartById(req.params?.cid)
+    res.send(result)
   }
   catch(e) {
-    console.error("Error:",e)
     res.status(500).send("Server error")
   }
 })
 
 router.post("/", async (req,res) => {
   try {
-    const result = await cartManager.addCart(req.body?.products || [])
-    res.status(result.status).send(result.payload)
+    const result = await cartsService.addCart(req.body || [])
+    res.send(result)
   }
   catch(e) {
     res.status(500).send("Server error")
@@ -41,8 +38,8 @@ router.put("/:cid", async (req,res) => {
 router.put("/:cid/product/:pid", async (req,res) => {
   try {
     const {params: {cid,pid}, body: {quantity}} = req
-    const result = await cartManager.updateProductFromCart(pid, cid, quantity)
-    res.status(result.status).send(result.payload)
+    const result = await cartsService.updateProductFromCart(pid,cid,quantity)
+    res.send(result)
   }
   catch(e) {
     console.error("Error:",e)

@@ -5,16 +5,13 @@ import routerCarts from "./routes/carts.router.js"
 import routerViews from "./routes/views.router.js"
 import routerSession from "./routes/session.router.js"
 import handlebars from "express-handlebars"
-import messageModel from "./dao/models/messages.model.js"
+import messageModel from "./dao/mongo/models/messages.model.js"
 import __dirname from "./utils.js"
 import cookieParser from "cookie-parser"
-import { Server } from "socket.io"
 import initializePassport from "./config/passport.config.js"
 import passport from "passport"
-
-const PORT = 8080
-const mongoUrl = "mongodb+srv://admin:1234@ecommerce.yr9omem.mongodb.net/"
-const dbName = "ecommerce"
+import { Server } from "socket.io"
+import { MONGO_URL, MONGO_DBNAME, PORT } from "./config/config.js"
 
 const app = express()
 
@@ -36,7 +33,7 @@ app.use("/api/products", routerProducts)
 app.use("/api/carts", routerCarts)
 app.use("/", routerViews)
 
-mongoose.connect(mongoUrl, {dbName})
+mongoose.connect(MONGO_URL, {dbName: MONGO_DBNAME})
   .then(() => {
     const httpServer = app.listen(PORT, () => console.log(`Listening on port: ${PORT}`))
     const socketServer = new Server(httpServer)
