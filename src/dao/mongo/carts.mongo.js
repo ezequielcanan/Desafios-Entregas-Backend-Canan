@@ -9,7 +9,7 @@ export default class Carts {
   }
 
   addCart = async (products) => {
-    const cart = await cartModel.create(products)
+    const cart = await cartModel.create(products || [])
     return cart
   }
 
@@ -19,7 +19,12 @@ export default class Carts {
   }
 
   updateProductFromCart = async (pid, cid, quantity=1) => {
-    const result = await cartModel.updateOne({_id: cid}, {$inc: {"products.$[].quantity": quantity}}, {upsert: true})
+    const product = await cartModel.findOne({_id: cid, "products.product": pid})
+    if (product) {
+      const result = await cartModel.updateOne({_id: cid, "products.product": pid}, {$inc: {"products.$.quantity": quantity}})
+      return result
+    }
+    const result = await cartModel.updateOne({_id: cid}, {$push: {products: {product: pid, quantity}}})
     return result
   }
 
@@ -33,3 +38,4 @@ export default class Carts {
     return result
   }
 } 
+

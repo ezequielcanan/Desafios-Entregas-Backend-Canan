@@ -1,61 +1,18 @@
 import { Router } from "express"
 import ProductManager from "../dao/managers/ProductManager.js"
+import { addProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../controllers/products.controller.js";
 
 const router = Router();
 const productManager = new ProductManager();
 
-router.get("/", async (req, res) => {
-  try {
-    const result = await productManager.getProducts(req);
-    if (result.status == 400 || result.status == 500)
-      return res.status(result.status).send(result.message);
-    return res.send(result.docs)
-  } catch (e) {
-    res.status(500).send("Server error")
-  }
-});
+router.get("/", getProducts);
 
-router.get("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-    const product = await productManager.getProductById(pid)
-    res.status(!product ? 404 : 200).send(product);
-  } catch (e) {
-    console.error("Error:", e);
-    res.status(500).send("Server error")
-  }
-});
+router.get("/:pid", getProductById);
 
-router.post("/", async (req, res) => {
-  try {
-    const result = await productManager.addProduct(req.body, req.body)
-    res.status(result.status).send(result.payload)
-  } catch (e) {
-    console.error("Error:", e);
-    res.status(500).send("Server error")
-  }
-});
+router.post("/", addProduct);
 
-router.put("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-    const result = await productManager.updateProduct(pid, req.body)
-    res.status(result.status).send(result.payload);
-  } catch (e) {
-    console.error("Error:", e);
-    res.status(500).send("Server error")
-  }
-});
+router.put("/:pid", updateProduct);
 
-router.delete("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-    const result = await productManager.deleteProduct(pid)
-    res.status(result.status).send(result.payload);
-  } catch (e) {
-    console.error("Error:", e);
-    res.status(500).send("Server error")
-  }
-});
+router.delete("/:pid", deleteProduct);
 
 export default router;
