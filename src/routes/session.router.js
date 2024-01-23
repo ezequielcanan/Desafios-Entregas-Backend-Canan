@@ -1,57 +1,19 @@
 import { Router } from "express"
 import passport from "passport"
+import { githubCallback, sessionCurrent, sessionLogin, sessionLogout, sessionRegister } from "../controllers/session.controller.js"
 
 const router = Router()
 
-router.post("/login", passport.authenticate("login", {session: false, failureRedirect: "/"}), async (req, res) => {
-  try {
-    if (!req.user) return res.status(400).send("Invalid credentials")
+router.post("/login", passport.authenticate("login", { session: false, failureRedirect: "/" }), sessionLogin)
 
-    const {token} = req.user
+router.post("/register", passport.authenticate("register", { failureRedirect: "/", session: false }), sessionRegister)
 
-    res.cookie("jwtCookie", token).redirect("/products")
-  } catch (e) {
-    console.log("Error:", e)
-    return res.status(500).send({ message: "Server Error" })
-  }
-})
+router.get("/github", passport.authenticate("github", { scope: ['user:email'], session: false }), async (req, res) => { })
 
-router.post("/register", passport.authenticate("register", {failureRedirect: "/", session: false}), async (req, res) => {
-  try {
-    res.send({ url: "login" })
-  }
-  catch (e) {
-    console.log("Error:", e)
-    return res.status(500).send({ message: "Server Error" })
-  }
-})
+router.get("/githubcallback", passport.authenticate("github", { failureRedirect: "/", session: false }), githubCallback)
 
-router.get("/github", passport.authenticate("github", {scope: ['user:email'], session: false}), async (req,res) => {})
+router.get("/current", passport.authenticate("jwt", { session: false }), sessionCurrent)
 
-router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/", session: false}), async (req,res) => {
-  try {
-    if (!req.user) return res.status(400).json({status: "error", payload: "Invalid github"})
-    return res.cookie("jwtCookie", req?.user?.token).redirect("/products")
-  }
-  catch (e) {
-    console.log("Error:", e)
-    return res.status(500).send({ message: "Server Error" })
-  }
-})
-
-router.get("/current", passport.authenticate("jwt", {session: false}), (req,res) => {
-  const {user} = req.user
-  res.json({status:"success", payload: user})
-})
-
-router.get("/logout", (req, res) => {
-  try {
-    res.cookie("jwtCookie", "").redirect("/login")
-  }
-  catch (e) {
-    console.log("Error:", e)
-    return res.status(500).send({ message: "Server Error" })
-  }
-})
+router.get("/logout", sessionLogout)
 
 export default router

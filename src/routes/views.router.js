@@ -1,28 +1,26 @@
 import { Router } from "express"
-import ProductManager from "../dao/managers/ProductManager.js"
-import CartManager from "../dao/managers/CartManager.js"
+import { productsService, cartsService } from "../services/index.js"
+import { getFindParameters } from "../middlewares/products.middlewares.js"
 import passport from "passport"
 
 const router = Router()
 
-const productManager = new ProductManager()
-const cartManager = new CartManager()
-
-const isLoggedIn = (req,res,next) => {
+const isLoggedIn = (req, res, next) => {
   if (req.cookies.jwtCookie) return res.redirect("/products")
 
- return next()
+  return next()
 }
 
-const auth = (req,res,next) => {
+const auth = (req, res, next) => {
   if (req.cookies.jwtCookie) return next()
 
   return res.redirect("/login")
 }
 
-router.get("/products", auth, passport.authenticate("jwt", {session: false}), async (req, res) => {
+router.get("/products", auth, passport.authenticate("jwt", { session: false }), getFindParameters, async (req, res) => {
   try {
-    const result = await productManager.getProducts(req)
+    const result = await productsService.getProducts(req?.queryFindParameters, req?.optionsPaginate)
+    result.user = req.user?.user || {}
     if (result.status == 400) return res.status(result.status).send(result.message)
     return res.render("products", result)
   }
@@ -32,39 +30,40 @@ router.get("/products", auth, passport.authenticate("jwt", {session: false}), as
   }
 })
 
-router.get("/products/:pid", async (req,res) => {
+router.get("/products/:pid", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { pid } = req.params;
-    const product = await productManager.getProductById(pid)
+    const product = await productsService.getProductById(pid)
     if (!product) return res.status(400).send(product)
+    product.user = req.user?.user
     res.render("product", product)
   }
   catch (e) {
-    console.error("Error:",e)
+    console.error("Error:", e)
     return res.status(500).send("Server error")
   }
 })
 
-router.get("/carts/:cid", async (req,res) => {
+router.get("/carts/:cid", async (req, res) => {
   try {
-    const {cid} = req.params
-    const products = await cartManager.getCartById(cid)
-    res.render("cart", {products})
+    const { cid } = req.params
+    const cart = await cartsService.getCartById(cid)
+    res.render("cart", cart)
 
   }
   catch (e) {
-    console.error("Error:",e)
+    console.error("Error:", e)
     res.status(500).send("Server error")
   }
 })
 
-router.get("/", (req,res) => res.redirect("/login"))
+router.get("/", (req, res) => res.redirect("/login"))
 
-router.get("/login", isLoggedIn, (req,res) => {
-  return res.render("login",{})
+router.get("/login", isLoggedIn, (req, res) => {
+  return res.render("login", {})
 })
 
-router.get("/register", isLoggedIn, (req,res) => {
+router.get("/register", isLoggedIn, (req, res) => {
   return res.render("register", {})
 })
 

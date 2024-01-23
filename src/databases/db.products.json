@@ -1,0 +1,1 @@
+[{"title":"Wine","category":"wines","description":"Cold wine","price":6.77,"code":"aaa003","stock":8,"status":true,"id":1},{"title":"Beer","category":"beers","description":"Cold beer","price":5.99,"code":"aaa005","stock":4,"status":true,"id":2},{"title":"Beer","category":"beers","description":"Cold beer","price":7.99,"code":"aaa006","stock":4,"status":true,"id":3}]

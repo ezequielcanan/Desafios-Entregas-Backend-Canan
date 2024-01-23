@@ -20,4 +20,11 @@
       {{/each}}
     </tbody>
   </table>
+  <button class="buy-button">Comprar</button>
 </main>
+<script>
+  document.querySelector(".buy-button").addEventListener("click", async (e) => {
+    const result = await (await fetch("/api/carts/{{_id}}/purchase", {method: "POST"})).json()
+    window.location.replace("/products")
+  })
+</script>

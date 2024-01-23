@@ -4,8 +4,14 @@
   <p>{{description}}</p>
   <h2>Stock: {{stock}}</h2>
   <h3>Price: ${{price}}</h3>
-  <a class="buy-button" id="{{_id}}" href="/products">Buy</a>
+  <button class="buy-button" id="{{_id}}">Buy</button>
 </main>
+<script>
+  document.querySelector(".buy-button").addEventListener("click", async (e) => {
+    await fetch(`/api/carts/{{user.cart}}/product/{{_id}}`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({quantity: 1})})
+    window.location.replace("/products")
+  })
+</script>
 <style>
   main {
     display: flex;

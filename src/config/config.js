@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
 import __dirname from "../utils.js"
 
-dotenv.config({path: __dirname + "/.env"})
+dotenv.config()
 
 export const PORT = process.env.PORT || 8080
 export const MONGO_URL = process.env.MONGO_URL

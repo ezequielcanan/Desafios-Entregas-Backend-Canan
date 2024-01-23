@@ -14,12 +14,12 @@ export default class CartsService {
   };
 
   updateCartProducts = async (cid, products) => {
-    const result = await this.dao.updateCartProducts(cid,products)
+    const result = await this.dao.updateCartProducts(cid, products)
     return result;
   };
 
   updateProductFromCart = async (pid, cid, quantity) => {
-    const result = await this.dao.updateProductFromCart(pid,cid,quantity)
+    const result = await this.dao.updateProductFromCart(pid, cid, quantity)
     return result;
   };
 
@@ -29,7 +29,7 @@ export default class CartsService {
   };
 
   deleteProductFromCart = async (cid, pid) => {
-    const result = await this.dao.deleteProductFromCart(cid,pid)
+    const result = await this.dao.deleteProductFromCart(cid, pid)
     return result;
   };
 }

@@ -1,7 +1,7 @@
 import productModel from "./models/products.model.js"
 
 export default class Products {
-  constructor() {}
+  constructor() { }
 
   getProducts = async (queryFindParameters, optionsPaginate) => {
     const result = await productModel.paginate(queryFindParameters, optionsPaginate)
@@ -24,11 +24,12 @@ export default class Products {
   }
 
   updateProduct = async (pid, fields) => {
-    const result = await productModel.updateOne({_id: pid}, {$set: {...fields}})
+    const result = await productModel.updateOne({ _id: pid }, { $set: { ...fields } })
     return result
   }
 
   deleteProduct = async (pid) => {
-    const result = await productModel.deleteOne({_id: pid})
+    const result = await productModel.deleteOne({ _id: pid })
+    return result
   }
 }

@@ -5,7 +5,7 @@ import routerCarts from "./routes/carts.router.js"
 import routerViews from "./routes/views.router.js"
 import routerSession from "./routes/session.router.js"
 import handlebars from "express-handlebars"
-import messageModel from "./dao/mongo/models/messages.model.js"
+import { messagesService } from "./services/index.js"
 import __dirname from "./utils.js"
 import cookieParser from "cookie-parser"
 import initializePassport from "./config/passport.config.js"
@@ -17,7 +17,7 @@ const app = express()
 
 app.use(cookieParser())
 app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }))
 app.use("/static", express.static(__dirname + "/public"))
 
 
@@ -33,15 +33,15 @@ app.use("/api/products", routerProducts)
 app.use("/api/carts", routerCarts)
 app.use("/", routerViews)
 
-mongoose.connect(MONGO_URL, {dbName: MONGO_DBNAME})
+mongoose.connect(MONGO_URL, { dbName: MONGO_DBNAME })
   .then(() => {
     const httpServer = app.listen(PORT, () => console.log(`Listening on port: ${PORT}`))
     const socketServer = new Server(httpServer)
     socketServer.on("connection", async socket => {
-      socket.emit("messages", await messageModel.find().lean().exec())
-      socket.on("new-message", async ({message, user}) => {
-        await messageModel.create({user,message})
-        socketServer.emit("messages", await messageModel.find().lean().exec())
+      socket.emit("messages", await messagesService.getMessages())
+      socket.on("new-message", async ({ message, user }) => {
+        await messagesService.createMessage(user, message)
+        socketServer.emit("messages", await messagesService.getMessages())
       })
     })
   })
