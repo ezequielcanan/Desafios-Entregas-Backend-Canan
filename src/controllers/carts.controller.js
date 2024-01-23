@@ -1,5 +1,16 @@
 import { cartsService, productsService, ticketsService } from "../services/index.js"
+import nodemailer from "nodemailer"
 import moment from "moment"
+import { PERSISTENCE } from "../config/config.js"
+
+const transport = nodemailer.createTransport({
+  service: "gmail",
+  port: 587,
+  auth: {
+    user: "ezequielcanan@gmail.com",
+    pass: "fxnvexqggtxqhcxz"
+  }
+})
 
 export const getCartById = async (req, res) => {
   try {
@@ -83,17 +94,34 @@ export const purchaseCart = async (req, res) => {
 
     const unavailableProducts = []
     const purchasedProducts = []
-    cart.products.forEach(async p => p.product.stock >= p.quantity ? (await productsService.updateProduct(p.product._id, { stock: p.product.stock - p.quantity }), purchasedProducts.push(p)) : unavailableProducts.push(p))
+
+
+    await Promise.all(cart.products.map(async p => {
+      if (PERSISTENCE == "MONGO") p.product.stock >= p.quantity ? (await productsService.updateProduct(p.product._id, { stock: p.product.stock - p.quantity }), purchasedProducts.push(p)) : unavailableProducts.push(p)
+      else {
+        const product = await productsService.getProductById(p.id)
+        product.stock >= p.quantity ? (await productsService.updateProduct(product.id, { stock: product.stock - p.quantity }), purchasedProducts.push({...p, product})) : unavailableProducts.push(p)
+      }
+    }))
+
 
     const ticket = {
       purchase_datetime: moment().format("YYYY-MM-DD hh:mm:ss"),
-      amount: purchasedProducts.reduce((acc, p) => acc + p.product.price * p.quantity, 0),
+      amount: purchasedProducts.reduce((acc, p) => {
+        return acc + (p?.product?.price) * p.quantity
+      }, 0),
       purchaser: req?.user?.user?.email
     }
     const ticketResult = await ticketsService.createTicket(ticket)
 
     const cartUpdateProducts = await cartsService.updateCartProducts(cid, unavailableProducts)
 
+    transport.sendMail({
+      from: "ezequielcanan@gmail.com",
+      to: req?.user?.user?.email,
+      subject: "Compra realizada",
+      html: "<h1>Realizaste la compra</h1>"
+    })
     res.json({ status: "success", payload: unavailableProducts.length ? unavailableProducts : ticketResult })
   }
   catch (e) {

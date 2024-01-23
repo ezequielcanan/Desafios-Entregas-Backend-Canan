@@ -24,7 +24,14 @@
 </main>
 <script>
   document.querySelector(".buy-button").addEventListener("click", async (e) => {
-    const result = await (await fetch("/api/carts/{{_id}}/purchase", {method: "POST"})).json()
+    if ("{{_id}}") {
+      const result = await (await fetch(`/api/carts/{{_id}}/purchase`, {method: "POST"})).json()
+      console.log(result)
+    }
+    else {
+      const result = await (await fetch(`/api/carts/{{id}}/purchase`, {method: "POST"})).json()
+      console.log(result)
+    }
     window.location.replace("/products")
   })
 </script>

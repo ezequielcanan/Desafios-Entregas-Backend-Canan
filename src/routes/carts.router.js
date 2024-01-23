@@ -8,7 +8,7 @@ const router = Router()
 router.get("/:cid", getCartById)
 
 router.post("/", addCart)
-router.post("/:cid/purchase", purchaseCart)
+router.post("/:cid/purchase", passport.authenticate("jwt", { session: false }), purchaseCart)
 
 router.put("/:cid", passport.authenticate("jwt", { session: false }), authorization("user"), updateCartProducts)
 

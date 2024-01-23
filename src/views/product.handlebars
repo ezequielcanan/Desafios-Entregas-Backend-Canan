@@ -8,8 +8,14 @@
 </main>
 <script>
   document.querySelector(".buy-button").addEventListener("click", async (e) => {
-    await fetch(`/api/carts/{{user.cart}}/product/{{_id}}`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({quantity: 1})})
-    window.location.replace("/products")
+    if ("{{_id}}") {
+      await fetch(`/api/carts/{{user.cart}}/product/{{_id}}`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({quantity: 1})})
+      window.location.replace("/products")
+    }
+    else {
+      await fetch(`/api/carts/{{user.cart}}/product/{{id}}`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({quantity: 1})})
+      window.location.replace("/products")
+    }
   })
 </script>
 <style>

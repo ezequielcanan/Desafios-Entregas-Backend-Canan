@@ -2,6 +2,7 @@ import { Router } from "express"
 import { productsService, cartsService } from "../services/index.js"
 import { getFindParameters } from "../middlewares/products.middlewares.js"
 import passport from "passport"
+import { PERSISTENCE } from "../config/config.js"
 
 const router = Router()
 
@@ -48,8 +49,12 @@ router.get("/carts/:cid", async (req, res) => {
   try {
     const { cid } = req.params
     const cart = await cartsService.getCartById(cid)
+    PERSISTENCE == "FILE" && (cart.products = await Promise.all(cart.products.map(async p => {
+      const product = await productsService.getProductById(p.id)
+      return {...p, product}
+    })))
+    
     res.render("cart", cart)
-
   }
   catch (e) {
     console.error("Error:", e)

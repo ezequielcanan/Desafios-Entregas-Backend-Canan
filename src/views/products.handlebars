@@ -19,7 +19,11 @@
             <td>{{this.stock}}</td>
             <td>{{this.price}}</td>
             <td>
-              <button class="view-more-button" id="{{this._id}}">View More</button>
+              {{#if this._id}}
+                <button class="view-more-button" id="{{this._id}}">View More</button>
+              {{else}}
+                <button class="view-more-button" id="{{this.id}}">View More</button>
+              {{/if}}
             </td>
           </tr>
         {{/each}}
