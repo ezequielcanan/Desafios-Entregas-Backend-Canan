@@ -1,23 +1,21 @@
 import { productsService } from "../services/index.js";
+import CustomError from "../errors/custom_errors.js";
 
-export const addProduct = async (req, res) => {
+export const addProduct = async (req, res, next) => {
   try {
     const { body } = req;
     const product = await productsService.getProductByFilter({
       code: body.code,
     });
-    if (product) {
-      return res.status(400).json({ status: "error", payload: "Invalid code" });
+
+    if (product || !productsService.checkProductProperties(body)) {
+      CustomError.createProduct(product)
     }
-    if (!productsService.checkProductProperties(body))
-      return res
-        .status(400)
-        .json({ status: "error", payload: "Missed properties" });
+
     const result = await productsService.addProduct(body);
     res.json({ status: "success", payload: result });
   } catch (e) {
-    console.error("Error:", e);
-    res.status(500).send("Server error");
+    next(e)
   }
 };
 

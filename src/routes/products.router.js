@@ -10,7 +10,7 @@ router.get("/", getFindParameters, getProducts);
 
 router.get("/:pid", getProductById);
 
-router.post("/", passport.authenticate("jwt", { session: false }), authorization("admin"), addProduct);
+router.post("/", addProduct);
 
 router.put("/:pid", passport.authenticate("jwt", { session: false }), authorization("admin"), updateProduct);
 
