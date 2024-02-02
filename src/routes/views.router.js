@@ -26,7 +26,7 @@ router.get("/products", auth, passport.authenticate("jwt", { session: false }), 
     return res.render("products", result)
   }
   catch (e) {
-    console.error(e)
+    req.logger.error("Error: " + e)
     return res.status(500).send("Server error")
   }
 })
@@ -40,7 +40,7 @@ router.get("/products/:pid", passport.authenticate("jwt", { session: false }), a
     res.render("product", product)
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     return res.status(500).send("Server error")
   }
 })
@@ -51,13 +51,13 @@ router.get("/carts/:cid", async (req, res) => {
     const cart = await cartsService.getCartById(cid)
     PERSISTENCE == "FILE" && (cart.products = await Promise.all(cart.products.map(async p => {
       const product = await productsService.getProductById(p.id)
-      return {...p, product}
+      return { ...p, product }
     })))
-    
+
     res.render("cart", cart)
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     res.status(500).send("Server error")
   }
 })

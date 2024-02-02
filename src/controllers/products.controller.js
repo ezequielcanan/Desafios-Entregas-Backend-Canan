@@ -27,7 +27,7 @@ export const getProducts = async (req, res) => {
     );
     res.json({ status: "success", payload: result.docs });
   } catch (e) {
-    console.error("Error:", e);
+    req.logger.error("Error: " + e);
     res.status(500).send("Server error");
   }
 };
@@ -37,7 +37,7 @@ export const getProductById = async (req, res) => {
     const result = await productsService.getProductById(req.params?.pid);
     res.json({ status: "success", payload: result });
   } catch (e) {
-    console.error("Error:", e);
+    req.logger.error("Error: " + e);
     if (e.name == "CastError") return res.status(404).send("Not found");
     res.status(500).send("Server error");
   }
@@ -53,7 +53,7 @@ export const updateProduct = async (req, res) => {
     });
     res.json({ status: "success", payload: result })
   } catch (e) {
-    console.error("Error:", e);
+    req.logger.error("Error: " + e);
     if (e.name == "CastError") return res.status(404).send("Not found");
     res.status(500).send("Server error");
   }
@@ -65,7 +65,7 @@ export const deleteProduct = async (req, res) => {
     res.json({ status: "success", payload: result })
   }
   catch (e) {
-    console.error("Error:", e);
+    req.logger.error("Error: " + e);
     if (e.name == "CastError") return res.status(404).send("Not found");
     res.status(500).send("Server error");
   }

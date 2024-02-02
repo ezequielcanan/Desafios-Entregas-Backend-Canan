@@ -19,7 +19,7 @@ export const getCartById = async (req, res) => {
     res.status(result ? 200 : 404).json({ status: result ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }
@@ -31,7 +31,7 @@ export const addCart = async (req, res) => {
     res.json({ status: result ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     res.status(500).send("Server error")
   }
 }
@@ -43,7 +43,7 @@ export const updateCartProducts = async (req, res) => {
     res.status(result.modifiedCount ? 200 : 404).json({ stauts: result.modifiedCount ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }
@@ -56,7 +56,7 @@ export const updateProductFromCart = async (req, res) => {
     res.status(result.modifiedCount ? 200 : 404).json({ stauts: result.modifiedCount ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }
@@ -69,7 +69,7 @@ export const deleteProductFromCart = async (req, res) => {
     res.status(result.modifiedCount ? 200 : 404).json({ stauts: result.modifiedCount ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }
@@ -81,7 +81,7 @@ export const deleteProducts = async (req, res) => {
     res.status(result.modifiedCount ? 200 : 404).json({ stauts: result.modifiedCount ? "success" : "error", payload: result })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }
@@ -100,7 +100,7 @@ export const purchaseCart = async (req, res) => {
       if (PERSISTENCE == "MONGO") p.product.stock >= p.quantity ? (await productsService.updateProduct(p.product._id, { stock: p.product.stock - p.quantity }), purchasedProducts.push(p)) : unavailableProducts.push(p)
       else {
         const product = await productsService.getProductById(p.id)
-        product.stock >= p.quantity ? (await productsService.updateProduct(product.id, { stock: product.stock - p.quantity }), purchasedProducts.push({...p, product})) : unavailableProducts.push(p)
+        product.stock >= p.quantity ? (await productsService.updateProduct(product.id, { stock: product.stock - p.quantity }), purchasedProducts.push({ ...p, product })) : unavailableProducts.push(p)
       }
     }))
 
@@ -125,7 +125,7 @@ export const purchaseCart = async (req, res) => {
     res.json({ status: "success", payload: unavailableProducts.length ? unavailableProducts : ticketResult })
   }
   catch (e) {
-    console.error("Error:", e)
+    req.logger.error("Error: " + e)
     if (e.name == "CastError") return res.status(404).send("Not found")
     res.status(500).send("Server error")
   }

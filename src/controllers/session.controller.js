@@ -6,7 +6,7 @@ export const sessionLogin = async (req, res) => {
     const { token } = req.user
     res.cookie("jwtCookie", token).redirect("/products")
   } catch (e) {
-    console.log("Error:", e)
+    req.logger.error("Error: " + e)
     return res.status(500).send({ message: "Server Error" })
   }
 }
@@ -16,7 +16,7 @@ export const sessionRegister = async (req, res) => {
     res.send({ url: "login" })
   }
   catch (e) {
-    console.log("Error:", e)
+    req.logger.error("Error: " + e)
     return res.status(500).send({ message: "Server Error" })
   }
 }
@@ -27,7 +27,7 @@ export const githubCallback = async (req, res) => {
     return res.cookie("jwtCookie", req?.user?.token).redirect("/products")
   }
   catch (e) {
-    console.log("Error:", e)
+    req.logger.error("Error: " + e)
     return res.status(500).send({ message: "Server Error" })
   }
 }
@@ -43,7 +43,7 @@ export const sessionLogout = (req, res) => {
     res.cookie("jwtCookie", "").redirect("/login")
   }
   catch (e) {
-    console.log("Error:", e)
+    req.logger.error("Error: " + e)
     return res.status(500).send({ message: "Server Error" })
   }
 }

@@ -11,11 +11,13 @@ import cookieParser from "cookie-parser"
 import initializePassport from "./config/passport.config.js"
 import passport from "passport"
 import errorsMiddleware from "./middlewares/errors.middlewares.js"
+import { addLogger, logger } from "./utils/logger.js"
 import { messagesService } from "./services/index.js"
 import { Server } from "socket.io"
 import { MONGO_URL, MONGO_DBNAME, PORT } from "./config/config.js"
 
 const app = express()
+app.use(addLogger)
 
 app.use(cookieParser())
 app.use(express.json())
@@ -40,7 +42,7 @@ app.use(errorsMiddleware)
 
 mongoose.connect(MONGO_URL, { dbName: MONGO_DBNAME })
   .then(() => {
-    const httpServer = app.listen(PORT, () => console.log(`Listening on port: ${PORT}`))
+    const httpServer = app.listen(PORT, () => logger.info(`Listening on port: ${PORT}`))
     const socketServer = new Server(httpServer)
     socketServer.on("connection", async socket => {
       socket.emit("messages", await messagesService.getMessages())
@@ -51,5 +53,5 @@ mongoose.connect(MONGO_URL, { dbName: MONGO_DBNAME })
     })
   })
   .catch(e => {
-    console.error(e)
+    logger.fatal("Fatal: ERROR TRYING TO CONNECT MONGO DB")
   })

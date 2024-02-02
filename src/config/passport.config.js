@@ -3,8 +3,8 @@ import local from "passport-local"
 import GithubStrategy from "passport-github2"
 import { cartsService, usersService } from "../services/index.js"
 import passportJWT from "passport-jwt"
-import CartModel from "../dao/mongo/models/carts.model.js"
 import { isValidPassword, createHash, jwtSign, generateToken } from "../utils.js"
+import { logger } from "../utils/logger.js"
 
 const LocalStrategy = local.Strategy
 const JWTStrategy = passportJWT.Strategy
@@ -19,7 +19,7 @@ const initializePassport = () => {
     try {
       const user = await usersService.getUserByEmail(username)
       if (user) {
-        console.log("User already exists")
+        req.logger.warning("Warning: User already exists")
         return done(null, false)
       }
       const cart = await cartsService.addCart([])
@@ -43,18 +43,19 @@ const initializePassport = () => {
   }))
 
   passport.use("login", new LocalStrategy({
-    usernameField: "email"
-  }, async (username, password, done) => {
+    usernameField: "email",
+    passReqToCallback: true
+  }, async (req, username, password, done) => {
     try {
       const user = await usersService.getUserByEmail(username)
 
       if (!user) {
-        console.log("User doesn't exists")
+        req.logger.warning("User doesn't exists")
         return done(null, false)
       }
 
       if (!isValidPassword(user, password)) {
-        console.log("Incorrect password")
+        req.logger.warning("Incorrect password")
         return done(null, false)
       }
 
@@ -76,7 +77,7 @@ const initializePassport = () => {
     try {
       let user = await usersService.getUserByEmail(profile._json.email)
       if (!user) {
-        console.log("User doesn't exists, pass to register")
+        logger.warning("User doesn't exists, pass to register")
 
         const cart = await cartsService.addCart([])
         user = await usersService.createUser({
