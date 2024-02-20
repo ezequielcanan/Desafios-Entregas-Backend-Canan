@@ -1,4 +1,6 @@
 import UsersSendDTO from "../dto/users.dto.js"
+import { usersService } from "../services/index.js"
+import { generateToken } from "../utils.js"
 
 export const sessionLogin = async (req, res) => {
   try {
@@ -41,6 +43,22 @@ export const sessionCurrent = (req, res) => {
 export const sessionLogout = (req, res) => {
   try {
     res.cookie("jwtCookie", "").redirect("/login")
+  }
+  catch (e) {
+    req.logger.error("Error: " + e)
+    return res.status(500).send({ message: "Server Error" })
+  }
+}
+
+export const resetPassword = async (req,res) => {
+  try {
+    const {email} = req?.body
+
+    const user = await usersService.getUserByEmail(email)
+    if (!user) return res.status(400).json({status: "error", payload: "User doesn't exists"})
+
+    const token = generateToken(user, "1h")
+
   }
   catch (e) {
     req.logger.error("Error: " + e)

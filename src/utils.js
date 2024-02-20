@@ -17,8 +17,8 @@ export const isValidPassword = (user, password) => {
   return bcrypt.compareSync(password, user.password);
 };
 
-export const generateToken = (user) => {
-  return jwt.sign({ user }, jwtSign, { expiresIn: "24h" });
+export const generateToken = (user, expiresIn = "24h") => {
+  return jwt.sign({ user }, jwtSign, { expiresIn });
 };
 
 export const generateProduct = () => {

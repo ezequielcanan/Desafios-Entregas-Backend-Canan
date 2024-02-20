@@ -1,16 +1,9 @@
 import { cartsService, productsService, ticketsService } from "../services/index.js"
-import nodemailer from "nodemailer"
-import moment from "moment"
 import { PERSISTENCE } from "../config/config.js"
+import Mail from "../modules/mail.module.js"
+import moment from "moment"
 
-const transport = nodemailer.createTransport({
-  service: "gmail",
-  port: 587,
-  auth: {
-    user: "ezequielcanan@gmail.com",
-    pass: "fxnvexqggtxqhcxz"
-  }
-})
+const mail = new Mail()
 
 export const getCartById = async (req, res) => {
   try {
@@ -116,12 +109,8 @@ export const purchaseCart = async (req, res) => {
 
     const cartUpdateProducts = await cartsService.updateCartProducts(cid, unavailableProducts)
 
-    transport.sendMail({
-      from: "ezequielcanan@gmail.com",
-      to: req?.user?.user?.email,
-      subject: "Compra realizada",
-      html: "<h1>Realizaste la compra</h1>"
-    })
+    mail.send(req?.user?.user?.email, "Compra realizada", "<h1>Relisazte la compra</h1>")
+
     res.json({ status: "success", payload: unavailableProducts.length ? unavailableProducts : ticketResult })
   }
   catch (e) {
