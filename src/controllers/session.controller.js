@@ -1,7 +1,9 @@
 import UsersSendDTO from "../dto/users.dto.js"
+import Mail from "../modules/mail.module.js"
 import { usersService } from "../services/index.js"
-import { generateToken } from "../utils.js"
+import { createHash, generateToken, isValidPassword, verifyToken } from "../utils.js"
 
+const mail = new Mail()
 export const sessionLogin = async (req, res) => {
   try {
     if (!req.user) return res.status(400).send("Invalid credentials")
@@ -52,16 +54,42 @@ export const sessionLogout = (req, res) => {
 
 export const resetPassword = async (req,res) => {
   try {
-    const {email} = req?.body
+    const {password, email} = req?.body
 
     const user = await usersService.getUserByEmail(email)
+    if (!user) return res.status(400).send({payload: "Invalid user"})
+
+    const validPassword = isValidPassword(user, password)
+    
+    if (validPassword) return res.status(400).send({payload: "la contraseña es la misma"})
+    
+    const result = await usersService.changeUserPassword(user, createHash(password))
+
+    res.json({result})
+  }
+  catch(e) {
+    req.logger.error("Error: " + e)
+    return res.status(401).send({ message: "Invalid token" })
+  }
+}
+
+export const changePasswordMail = async (req,res) => {
+  try {
+    const {email} = req?.body
+    
+    const user = await usersService.getUserByEmail(email)
     if (!user) return res.status(400).json({status: "error", payload: "User doesn't exists"})
-
+    
     const token = generateToken(user, "1h")
-
+    
+    const url = `http://localhost:8080/reset-password?token=${token}`
+    
+    await mail.send(email, "Cambiar contraseña", `${url}`)
+    
+    res.json({status: "success", payload: {url, email}})
   }
   catch (e) {
-    req.logger.error("Error: " + e)
+    req.logger.error("Error: " + e + req)
     return res.status(500).send({ message: "Server Error" })
   }
 }

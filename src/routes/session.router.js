@@ -1,7 +1,7 @@
 import passport from "passport"
 import { authorization } from "../middlewares/auth.middlewares.js"
 import { Router } from "express"
-import { githubCallback, sessionCurrent, sessionLogin, sessionLogout, sessionRegister } from "../controllers/session.controller.js"
+import { changePasswordMail, githubCallback, resetPassword, sessionCurrent, sessionLogin, sessionLogout, sessionRegister } from "../controllers/session.controller.js"
 
 const router = Router()
 
@@ -14,6 +14,10 @@ router.get("/github", passport.authenticate("github", { scope: ['user:email'], s
 router.get("/githubcallback", passport.authenticate("github", { failureRedirect: "/", session: false }), githubCallback)
 
 router.get("/current", passport.authenticate("jwt", { session: false }), authorization("user"), sessionCurrent)
+
+router.post("/change-password", changePasswordMail)
+
+router.put("/reset-password", resetPassword)
 
 router.get("/logout", sessionLogout)
 

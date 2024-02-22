@@ -17,4 +17,9 @@ export default class UsersService {
     const newUser = await this.dao.createUser(user)
     return newUser
   }
+
+  changeUserPassword = async (user, password) => {
+    const result = await this.dao.updatePassword(user, password)
+    return result
+  }
 }

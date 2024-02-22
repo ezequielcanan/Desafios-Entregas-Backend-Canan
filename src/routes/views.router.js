@@ -2,6 +2,8 @@ import { Router } from "express"
 import { productsService, cartsService } from "../services/index.js"
 import { getFindParameters } from "../middlewares/products.middlewares.js"
 import passport from "passport"
+import { usersService } from "../services/index.js"
+import { verifyToken } from "../utils.js"
 import { PERSISTENCE } from "../config/config.js"
 
 const router = Router()
@@ -74,6 +76,23 @@ router.get("/register", isLoggedIn, (req, res) => {
 
 router.get("/chat", (req, res) => {
   return res.render("chat", {})
+})
+
+router.get("/reset-password", async (req,res) => {
+  try {
+
+    const {token} = req?.query
+    const data = verifyToken(token)
+    
+    const user = usersService.getUserByEmail(data?.email)
+    if (!user) return res.render("password", {valid: true})
+    
+    res.render("password", {...data, valid: true})
+  }
+  catch(e) {
+    const {user: {email}} = verifyToken(req?.query?.token, true)
+    res.render("password", {valid: false, expired: true, email })
+  }
 })
 
 export default router

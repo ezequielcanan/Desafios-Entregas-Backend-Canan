@@ -12,4 +12,6 @@ export default class Users extends FileManager {
   }
 
   createUser = async (user) => this.add(user)
+  
+  updatePassword = async (user, password) => this.update(user.id, {...user, password})
 }

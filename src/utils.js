@@ -21,6 +21,10 @@ export const generateToken = (user, expiresIn = "24h") => {
   return jwt.sign({ user }, jwtSign, { expiresIn });
 };
 
+export const verifyToken = (token, ignoreExpiration = false) => {
+  return jwt.verify(token, jwtSign, {ignoreExpiration})
+}
+
 export const generateProduct = () => {
   return (
     {

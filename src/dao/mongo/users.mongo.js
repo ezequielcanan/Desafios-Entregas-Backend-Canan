@@ -7,4 +7,6 @@ export default class Users {
   getUserByEmail = async (email) => userModel.findOne({ email }).lean().exec()
 
   createUser = async (user) => userModel.create(user)
+
+  updatePassword = async (user, password) => userModel.updateOne({_id: user._id}, {$set: {password}})
 }
