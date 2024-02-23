@@ -44,7 +44,14 @@ export const updateCartProducts = async (req, res) => {
 
 export const updateProductFromCart = async (req, res) => {
   try {
-    const { params: { pid, cid }, body: { quantity } } = req
+    const { params: { pid, cid }, body: { quantity }, user: { user } } = req
+
+    if (user.role != user) {
+      const product = await productsService.getProductById(pid)
+      if (product.owner == (user?._id || user?.id)) return res.status(400).send("This is your product")
+    }
+
+
     const result = await cartsService.updateProductFromCart(pid, cid, quantity)
     res.status(result.modifiedCount ? 200 : 404).json({ stauts: result.modifiedCount ? "success" : "error", payload: result })
   }

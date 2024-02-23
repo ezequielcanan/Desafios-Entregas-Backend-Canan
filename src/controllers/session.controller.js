@@ -52,41 +52,58 @@ export const sessionLogout = (req, res) => {
   }
 }
 
-export const resetPassword = async (req,res) => {
+export const resetPassword = async (req, res) => {
   try {
-    const {password, email} = req?.body
+    const { password, email } = req?.body
 
     const user = await usersService.getUserByEmail(email)
-    if (!user) return res.status(400).send({payload: "Invalid user"})
+    if (!user) return res.status(400).send({ payload: "Invalid user" })
 
     const validPassword = isValidPassword(user, password)
-    
-    if (validPassword) return res.status(400).send({payload: "la contraseña es la misma"})
-    
+
+    if (validPassword) return res.status(400).send({ payload: "la contraseña es la misma" })
+
     const result = await usersService.changeUserPassword(user, createHash(password))
 
-    res.json({result})
+    res.json({ result })
   }
-  catch(e) {
+  catch (e) {
     req.logger.error("Error: " + e)
     return res.status(401).send({ message: "Invalid token" })
   }
 }
 
-export const changePasswordMail = async (req,res) => {
+export const changePasswordMail = async (req, res) => {
   try {
-    const {email} = req?.body
-    
+    const { email } = req?.body
+
     const user = await usersService.getUserByEmail(email)
-    if (!user) return res.status(400).json({status: "error", payload: "User doesn't exists"})
-    
+    if (!user) return res.status(400).json({ status: "error", payload: "User doesn't exists" })
+
     const token = generateToken(user, "1h")
-    
+
     const url = `http://localhost:8080/reset-password?token=${token}`
-    
+
     await mail.send(email, "Cambiar contraseña", `${url}`)
-    
-    res.json({status: "success", payload: {url, email}})
+
+    res.json({ status: "success", payload: { url, email } })
+  }
+  catch (e) {
+    req.logger.error("Error: " + e + req)
+    return res.status(500).send({ message: "Server Error" })
+  }
+}
+
+export const switchRole = async (req, res) => {
+  try {
+    const { uid } = req?.params
+
+    const user = await usersService.getUserById(uid)
+    if (!user) return res.status(400).json({ status: "error", payload: "User doesn't exists" })
+
+    const result = await usersService.switchRole(user)
+
+    res.json({ status: "success", payload: result })
   }
   catch (e) {
     req.logger.error("Error: " + e + req)

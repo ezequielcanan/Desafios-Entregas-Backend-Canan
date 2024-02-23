@@ -8,5 +8,9 @@ export default class Users {
 
   createUser = async (user) => userModel.create(user)
 
-  updatePassword = async (user, password) => userModel.updateOne({_id: user._id}, {$set: {password}})
+  updateUser = async (user, value, field = "password") => {
+    const updateObj = {}
+    updateObj[field] = value
+    return userModel.updateOne({ _id: user._id }, { $set: updateObj })
+  }
 }

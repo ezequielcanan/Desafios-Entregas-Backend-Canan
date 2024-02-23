@@ -19,7 +19,13 @@ export default class UsersService {
   }
 
   changeUserPassword = async (user, password) => {
-    const result = await this.dao.updatePassword(user, password)
+    const result = await this.dao.updateUser(user, password)
+    return result
+  }
+
+  switchRole = async (user) => {
+    const role = user?.role != "admin" ? (user?.role == "user" ? "premium" : "user") : "admin"
+    const result = await this.dao.updateUser(user, role, "role")
     return result
   }
 }
