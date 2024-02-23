@@ -46,7 +46,7 @@ export const updateProductFromCart = async (req, res) => {
   try {
     const { params: { pid, cid }, body: { quantity }, user: { user } } = req
 
-    if (user.role != user) {
+    if (user.role != "user") {
       const product = await productsService.getProductById(pid)
       if (product.owner == (user?._id || user?.id)) return res.status(400).send("This is your product")
     }
