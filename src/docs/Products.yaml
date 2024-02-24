@@ -1,0 +1,213 @@
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos usando parametros para filtrar por categoria, precio, stock, etc.
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Los productos fueron devueltos satisfactoriamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "500":
+          description: Error interno del servidor
+    post:
+      summary: Crea un nuevo producto.
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestsBodies/insertProduct'
+      responses:
+        "200":
+          description: "Producto ingresado"
+        "400":
+          description: "Error de creacion o propiedades erroneas"
+        "500":
+          description: Error interno del servidor
+
+  /api/products/{pid}:
+    get:
+      summary: Obtiene el producto con el parametro pid
+      tags: 
+        - Products
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestsBodies/insertProduct'
+      responses:
+        "200":
+          description: El producto fue devuelto satisfactoriamente
+        "500":
+          description: Error interno del servidor
+        "404":
+          description: No se encontro el producto
+    put:
+      summary: "Actualizar producto (no hace falta poner en el body todas las propiedades)"
+      tags:
+        - Products
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestsBodies/updateProduct'
+      responses:
+        "200":
+          description: El producto fue actualizado satisfactoriamente
+        "500":
+          description: Error interno del servidor
+        "404":
+          description: No se encontro el producto
+    delete:
+      summary: Borra el producto con el parametro pid
+      tags: 
+        - Products
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto
+        schema:
+          type: string
+      responses:
+        "200":
+          description: El producto fue eliminado satisfactoriamente
+        "500":
+          description: Error interno del servidor
+        "404":
+          description: No se encontro el producto
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID AUTOGENERADO POR MONGO
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price: 
+          type: number
+          description: Precio del producto
+        code: 
+          type: string
+          description: Codigo del producto
+        stock: 
+          type: number
+          description: Stock disponible del producto
+        category: 
+          type: string
+          description: Categoria del producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        owner: 
+          type: ObjectId
+          description: Usuario creador del producto (vacio para admin)
+      example:
+        _id: ObjectId('656211b7ecada54539f735d8')
+        title: Seagate 2TB External Hard Drive
+        description: High-capacity external hard drive for data backup and storage.
+        price: 79.99
+        code: SEA256
+        stock: 1
+        category: Storage
+        status: true
+        thumbnail: /static/multimedia/hard_drive_seagate.jpg
+  requestsBodies:
+    insertProduct:
+      type: object
+      properties:
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price: 
+          type: number
+          description: Precio del producto
+        code: 
+          type: string
+          description: Codigo del producto
+        stock: 
+          type: number
+          description: Stock disponible del producto
+        category: 
+          type: string
+          description: Categoria del producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        owner: 
+          type: ObjectId
+          description: Usuario creador del producto (vacio para admin)
+      example:
+        title: Seagate 2TB External Hard Drive
+        description: High-capacity external hard drive for data backup and storage.
+        price: 79.99
+        code: SEA256
+        stock: 1
+        category: Storage
+        status: true
+        thumbnail: /static/multimedia/hard_drive_seagate.jpg
+    updateProduct:
+      type: object
+      properties:
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string
+          description: Descripcion del producto
+        price: 
+          type: number
+          description: Precio del producto
+        stock: 
+          type: number
+          description: Stock disponible del producto
+        category: 
+          type: string
+          description: Categoria del producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        owner: 
+          type: ObjectId
+          description: Usuario creador del producto (vacio para admin)
+      example:
+        title: Seagate 2TB External Hard Drive
+        description: High-capacity external hard drive for data backup and storage.
+        price: 79.99
+        stock: 1
+        category: Storage
+        status: true
+        thumbnail: /static/multimedia/hard_drive_seagate.jpg

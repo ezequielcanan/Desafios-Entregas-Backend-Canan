@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema({
   stock: Number,
   category: String,
   status: Boolean,
+  thumbnail: String,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "users" }
 })
 
