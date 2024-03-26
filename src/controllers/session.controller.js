@@ -110,3 +110,36 @@ export const switchRole = async (req, res) => {
     return res.status(500).send({ message: "Server Error" })
   }
 }
+
+export const getAllUsers = async (req,res) => {
+  try {
+    const users = await usersService.getUsers()
+    res.json({ status: "success", payload: users })
+  }
+  catch (e) {
+    req.logger.error("Error: " + e + req)
+    return res.status(500).send({ message: "Server Error" })
+  }
+}
+
+export const deleteUser = async (req,res) => {
+  try {
+    const result = await usersService.deleteUser(req?.params?.uid)
+    res.json({ status: "success", payload: result })
+  }
+  catch (e) {
+    req.logger.error("Error: " + e + req)
+    return res.status(500).send({ message: "Server Error" })
+  }
+}
+
+export const deleteInactiveUsers = async (req,res) => {
+  try {
+    const result = await usersService.deleteInactiveUsers()
+    res.json({ status: "success", payload: result })
+  }
+  catch (e) {
+    req.logger.error("Error: " + e + req)
+    return res.status(500).send({ message: "Server Error" })
+  }
+}

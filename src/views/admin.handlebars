@@ -1,0 +1,42 @@
+<main>
+  <div>
+    <h1>Users</h1>
+    <button onclick="deleteInactive()">Delete inactive</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Rol</th>
+        <th>Cambiar</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+        <tr class="product">
+          <td>{{this.email}}</td>
+          <td>{{this.role}}</td>
+          <td onclick="changeRole('{{this._id}}')"><button>Cambiar role</button></td>
+          <td onclick="deleteUser('{{this._id}}')"><button>Eliminar</button></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <button class="buy-button">Comprar</button>
+</main>
+<script>
+  const deleteUser = async (uid) => {
+    await fetch(`/api/session/${uid}`, {method: "DELETE"})
+    window.location.reload()
+  }
+  const changeRole = async (uid) => {
+    await fetch(`/api/session/premium/${uid}`, {method: "PUT"})
+    window.location.reload()
+  }
+  const deleteInactive = async () => {
+    console.log("asdasdasd")
+    await fetch(`/api/session`, {method: "DELETE"})
+    window.location.reload()
+  }
+</script>

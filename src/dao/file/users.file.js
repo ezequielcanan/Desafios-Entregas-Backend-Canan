@@ -10,6 +10,7 @@ export default class Users extends FileManager {
     const users = await this.get()
     return users.find((u) => u.email === email)
   }
+  getUsers = async () => this.get() 
 
   createUser = async (user) => this.add(user)
 
@@ -18,4 +19,6 @@ export default class Users extends FileManager {
     updateObj[field] = value
     return this.update(user.id, updateObj)
   }
+
+  deleteUser = async (uid) => this.delete(uid)
 }

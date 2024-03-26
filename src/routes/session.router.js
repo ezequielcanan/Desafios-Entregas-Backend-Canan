@@ -1,13 +1,16 @@
 import passport from "passport"
 import { authorization } from "../middlewares/auth.middlewares.js"
 import { Router } from "express"
-import { changePasswordMail, githubCallback, resetPassword, sessionCurrent, sessionLogin, sessionLogout, sessionRegister, switchRole } from "../controllers/session.controller.js"
+import { changePasswordMail, deleteInactiveUsers, deleteUser, getAllUsers, githubCallback, resetPassword, sessionCurrent, sessionLogin, sessionLogout, sessionRegister, switchRole } from "../controllers/session.controller.js"
 
 const router = Router()
+
 
 router.post("/login", passport.authenticate("login", { session: false, failureRedirect: "/" }), sessionLogin)
 
 router.post("/register", passport.authenticate("register", { failureRedirect: "/", session: false }), sessionRegister)
+
+router.get("/", passport.authenticate("jwt", { session: false }), authorization(["admin"]), getAllUsers)
 
 router.get("/github", passport.authenticate("github", { scope: ['user:email'], session: false }), async (req, res) => { })
 
@@ -22,5 +25,9 @@ router.put("/reset-password", resetPassword)
 router.put("/premium/:uid", passport.authenticate("jwt", { session: false }), switchRole)
 
 router.get("/logout", sessionLogout)
+
+router.delete("/", passport.authenticate("jwt", { session: false }), authorization(["admin"]), deleteInactiveUsers)
+router.delete("/:uid", passport.authenticate("jwt", { session: false }), authorization(["admin"]), deleteUser)
+
 
 export default router

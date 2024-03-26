@@ -49,6 +49,7 @@ const initializePassport = () => {
     try {
       const user = await usersService.getUserByEmail(username)
 
+
       if (!user) {
         req.logger.warning("User doesn't exists")
         return done(null, false)
@@ -59,6 +60,7 @@ const initializePassport = () => {
         return done(null, false)
       }
 
+      await usersService.updateLastConnection(user)
       const token = generateToken(user)
       user.token = token
 
@@ -90,6 +92,8 @@ const initializePassport = () => {
           role: profile._json.email == "adminCoder@coder.com" ? "admin" : "user"
         })
       }
+
+      await usersService.updateLastConnection(user)
       const token = generateToken(user)
       user.token = token
 
