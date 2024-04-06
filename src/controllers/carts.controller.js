@@ -116,7 +116,7 @@ export const purchaseCart = async (req, res) => {
 
     const cartUpdateProducts = await cartsService.updateCartProducts(cid, unavailableProducts)
 
-    mail.send(req?.user?.user?.email, "Compra realizada", "<h1>Relisazte la compra</h1>")
+    mail.send(req?.user?.user?.email, "Compra realizada", `<h1>Relisazte la compra</h1> <p>${JSON.stringify(purchasedProducts)}</p>`)
 
     res.json({ status: "success", payload: unavailableProducts.length ? unavailableProducts : ticketResult })
   }

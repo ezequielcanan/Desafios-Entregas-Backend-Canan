@@ -7,6 +7,7 @@
         <th>Category</th>
         <th>Quantity</th>
         <th>Price by unit</th>
+        <th>Borrar</th>
       </tr>
     </thead>
     <tbody>
@@ -16,6 +17,7 @@
           <td>{{this.product.category}}</td>
           <td>{{this.quantity}}</td>
           <td>{{this.product.price}}</td>
+          <td onclick="deleteProduct('{{this.product._id}}')"><button>Borrar</button></td>
         </tr>
       {{/each}}
     </tbody>
@@ -34,4 +36,9 @@
     }
     window.location.replace("/products")
   })
+
+  const deleteProduct = async (pid) => {
+    await fetch("/api/carts/{{_id}}/products/"+pid, {method: "DELETE"})
+    window.location.replace("/products")
+  }
 </script>
